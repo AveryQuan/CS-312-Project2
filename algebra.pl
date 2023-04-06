@@ -135,6 +135,20 @@ integ(A^X , X , A^X / ln(A) ):-
 % integ(5, X, 5*X).
 % integ(X^4, X, (X^5)/5).
 
+integ(C*A,X,C*IA) :-
+    atomic(C),
+    integ(A, X, IA).
+integ(A+B,X,IA+IB) :-
+    integ(A,X,IA),
+    integ(B,X,IB).
+integ(A-B,X,IA-IB) :-
+    integ(A,X,IA),
+    integ(B,X,IB).
+
+% DEMO
+% integ(8*x, x, I).
+% integ(2*x+x, x, I).
+% integ(2*x-x, x, I).
 
 %simplify(Exp, Exp2) is true if expression Exp2 is a simplifed form of Exp
 simplify(X,X) :-
