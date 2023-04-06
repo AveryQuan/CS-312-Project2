@@ -6,34 +6,42 @@
 %eval(Exp, Env, V) is true if expression Exp evaluates to V given environment Env
 % An environment is a list of val(Var,Val) indicating that variable Var has value Val
 eval(X,Env,V) :-
-    member(val(X,V),Env).
+    member(val(X,V),Env),
+    format('[Step] We resolve the value of ~w = ~f~n', [X,V]). 
 eval(N,_,N) :-
-    number(N).
+    number(N). %No steps needed, a number is a number.
 eval((A+B),Env,V) :-
     eval(A,Env,VA),
     eval(B,Env,VB),
-    V is VA+VB.
+    V is VA+VB,
+    format('[Step] We take the sum of ~w = ~f and ~w = ~f to get ~f~n', [A,VA,B,VB,V]). 
 eval((A*B),Env,V) :-
     eval(A,Env,VA),
     eval(B,Env,VB),
-    V is VA*VB.
+    V is VA*VB,
+    format('[Step] We take the product of ~w = ~f and ~w = ~f to get ~f~n', [A,VA,B,VB,V]). 
 eval((A-B),Env,V) :-
     eval(A,Env,VA),
     eval(B,Env,VB),
-    V is VA-VB.
+    V is VA-VB,
+    format('[Step] We subtract ~w = ~f from ~w = ~f to get ~f~n', [B,VB,A,VA,V]). 
 eval(-A,Env,V) :-
     eval(A,Env,VA),
-    V is -VA.
+    V is -VA,
+    format('[Step] We negate ~w = ~f to get ~f~n', [A,VA,V]). 
+
 eval((A^B),Env,V) :-
     eval(A,Env,VA),
     eval(B,Env,VB),
-    V is VA^VB.
+    V is VA^VB,
+    format('[Step] We take ~w = ~f to the power of ~w = ~f to get ~f~n', [A,VA,B,VB,V]). 
 eval(log(A),Env,V) :-
     eval(A,Env,VA),
     V is log(VA).
 eval(exp(A),Env,V) :-
     eval(A,Env,VA),
-    V is exp(VA).
+    V is exp(VA),
+    print("exp of").
 eval(sigmoid(A),Env,V) :-
     eval(A,Env,VA),
     V is 1/(1+exp(-VA)).
