@@ -37,14 +37,16 @@ eval((A^B),Env,V) :-
     format('[Step] We take ~w = ~f to the power of ~w = ~f to get ~f~n', [A,VA,B,VB,V]). 
 eval(log(A),Env,V) :-
     eval(A,Env,VA),
-    V is log(VA).
+    V is log(VA),
+    format('[Step] We take the natural log of ~w = ~f to get ~f~n', [A,VA,V]).
 eval(exp(A),Env,V) :-
     eval(A,Env,VA),
     V is exp(VA),
-    print("exp of").
+   format('[Step] We get the natural exponent of ~w (e^~w) to get ~f~n', [A,VA,V]).
 eval(sigmoid(A),Env,V) :-
     eval(A,Env,VA),
-    V is 1/(1+exp(-VA)).
+    V is 1/(1+exp(-VA)),
+    format('[Step] We get the sigmoid of ~w = ~f to get ~f~n', [A,VA,V]).
 
 % try:
 % eval(aa*aa+b*11, [val(aa,3), val(b,7), val(dd,23)], V).
