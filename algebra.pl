@@ -83,36 +83,52 @@ smps(A*B,V) :- number(A), number(B), V is A*B.
 smps(A*B,A*B).
 
 % deriv(E,X,DE) is true if DE is the derivative of E with respect to X
-deriv(X,X,1).
-deriv(C,X,0) :- atomic(C), dif(C,X).
+deriv(X,X,1) :-
+    format('[Step] Derivative of ~w w.r.t. ~w = ~f~n', [X,X,1]). 
+deriv(C,X,0) :- 
+    atomic(C),
+    dif(C,X),
+    format('[Step] Derivative of ~w w.r.t. ~w = ~f~n', [C,X,0]).
 deriv(A+B,X,DA+DB) :-
     deriv(A,X,DA),
-    deriv(B,X,DB).
+    deriv(B,X,DB),
+    format('[Step] Derivative of sums is sum of derivatives: d/dx (~w + ~w) = d/dx ~w + d/dx ~w = ~w~n', [A,B,A,B,DA+DB]).
 deriv(A-B,X,DA-DB) :-
     deriv(A,X,DA),
-    deriv(B,X,DB).
+    deriv(B,X,DB),
+    format('[Step] Derivative of sums is sum of derivatives: d/dx (~w - ~w) = d/dx ~w - d/dx ~w = ~w~n', [A,B,A,B,DA-DB]).
 deriv(A*B,X,A*DB+B*DA) :-
     deriv(A,X,DA),
-    deriv(B,X,DB).
+    deriv(B,X,DB),
+    format('[Step] Derivative of products: d/dx (~w*~w) = ~w d/dx ~w + ~w d/dx ~w = ~w~n', [A,B,A,B,B,A,A*DB+B*DA]).
 deriv(A/B,X,(B*DA-A*DB)/(B*B)) :-
     deriv(A,X,DA),
-    deriv(B,X,DB).
+    deriv(B,X,DB),
+    format('[Step] Derivative of quotient: d/dx (~w/~w) = (~w d/dx ~w - ~w d/dx ~w)/(~w*~w) = ~w~n', [A,B,B,A,A,B,B,B,(B*DA-A*DB)/(B*B)]).
 
 deriv(-A,X,-DA) :-
-    deriv(A,X,DA).
+    deriv(A,X,DA),
+    format('[Step] Derivative of ~w w.r.t. ~w = ~w~n', [-A,X,-DA]). 
 deriv(A^B,X,B*(A^(B-1))*DA) :-  % only works when B does not involve X
-    deriv(A,X,DA).
+    deriv(A,X,DA),
+    format('[Step] Derivative of exponent: d/dx ~w = ~w*(~w^(~w-1))*~w ~n', [A^B,B,A,B,DA]). 
 deriv(sin(E),X,cos(E)*DE) :-
-    deriv(E,X,DE).
+    deriv(E,X,DE),
+    format('[Step] Derivative of sine is cosine: d/dx ~w = ~w~n', [sin(E),cos(E)*DE]). 
 deriv(cos(E),X,-sin(E)*DE) :-
-    deriv(E,X,DE).
+    deriv(E,X,DE),
+    format('[Step] Derivative of cosine is negative sine: d/dx ~w = ~w~n', [cos(E),-sin(E)*DE]). 
 deriv(exp(E),X,exp(E)*DE) :-
-    deriv(E,X,DE).
+    deriv(E,X,DE),
+    format('[Step] Derivative of exponent: d/dx ~w = exp(~w) ~n', [exp(E),exp(E)*DE]). 
 deriv(log(E),X,DE/E) :-
-  deriv(E,X,DE).
+  deriv(E,X,DE),
+  format('[Step] Derivative of log: d/dx ~w = ~w~n', [log(E),DE/E]). 
+
 % sigmoid(X) = 1/(1+exp(-X))
 deriv(sigmoid(E),X,sigmoid(E)*(1-sigmoid(E))*DE) :-
-    deriv(E,X,DE).
+    deriv(E,X,DE),
+    format('[Step] Derivative of sigmoid: d/dx ~w = ~w~n', [sigmoid(E),sigmoid(E)*(1-sigmoid(E))*DE]). 
 
 
 % Some Examples to try:
