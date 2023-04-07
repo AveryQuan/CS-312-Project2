@@ -144,17 +144,28 @@ deriv(sigmoid(E),X,sigmoid(E)*(1-sigmoid(E))*DE) :-
 
 
 % Basic Integral Rules
-integ(0, X, 0).
-integ(C, X, C*X) :- atomic(C), dif(C, X).
-integ(X, X, X^2/2).
-integ(X^N, X, (X^A)/A) :- atomic(N), A is N+1.
-integ(1/X, X, ln(abs(X))).
-integ((e/0)^X, X, (e/0)^X).
-integ(C^X, X, (C^X)/ln(C)) :- atomic(C), dif(C,X).
-integ(ln(X), X, X*ln(X)-X).
-integ(A^X , X , A^X / ln(A) ):-
-        atomic(A),
-        dif(A, X).
+integ(0, X, 0) :-
+    format('[Step] Integral of ~w w.r.t. ~w = ~w~n', [0,X,0]).
+integ(C, X, C*X) :- 
+    atomic(C),
+    dif(C, X),
+    format('[Step] Integral of a constant ~w w.r.t. ~w = ~w~n', [C,X,C*X]).
+integ(X, X, X^2/2) :-
+    format('[Step] Integral of ~w w.r.t. ~w = ~w~n', [X,X,X^2/2]).
+integ(X^N, X, (X^A)/A) :- 
+    atomic(N), 
+    A is N+1,
+    format('[Step] Integral of ~w w.r.t. ~w = ~w~n', [X^N,X,(X^A)/A]).
+integ(C/X, X, C*log(abs(X))) :-
+    format('[Step] Integral of ~w w.r.t. ~w = ~w~n', [C/X,X,C*log(abs(X))]).
+integ(exp(X), X, exp(X)) :-
+    format('[Step] Integral of exponent ~w w.r.t. ~w = ~w~n', [exp(X),X,exp(X)]).
+integ(C^X, X, (C^X)/log(C)) :- 
+    atomic(C),
+    dif(C,X),
+    format('[Step] Integral of constant to the power of a variable: ~w w.r.t. ~w = ~w~n', [C^X, X, (C^X)/log(C)]).
+integ(log(X), X, X*log(X)-X) :-
+    format('[Step] Integral of log: ~w w.r.t. ~w = ~w~n', [log(X), X, X*log(X)-X]).
 
 % DEMO
 % integ(0, X, 0).
@@ -163,13 +174,17 @@ integ(A^X , X , A^X / ln(A) ):-
 
 integ(C*A,X,C*IA) :-
     atomic(C),
-    integ(A, X, IA).
+    integ(A, X, IA),
+    format('[Step] Integral of constant multiple: ~w w.r.t. ~w = ~w~n', [C*A,X,C*IA]).
 integ(A+B,X,IA+IB) :-
     integ(A,X,IA),
-    integ(B,X,IB).
+    integ(B,X,IB),
+    format('[Step] Integral of sum is sum of integrals: Integral of ~w w.r.t. ~w = ~w~n', [A+B,X,IA+IB]).
 integ(A-B,X,IA-IB) :-
     integ(A,X,IA),
-    integ(B,X,IB).
+    integ(B,X,IB),
+    format('[Step] Integral of sum is sum of integrals: Integral of ~w w.r.t. ~w = ~w~n', [A-B,X,IA-IB]).
+
 
 % DEMO
 % integ(8*x, x, I).
