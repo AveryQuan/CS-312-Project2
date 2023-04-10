@@ -123,10 +123,7 @@ eval(exp(A),Env,V) :-
 % Integral of exponent function: integ(exp(y),y,V),eval(V,[val(y,1)],X).  
 % Logarithmic integral: integ(log(y),y,V),eval(V,[val(y,17)],X).
 
-
-
 %  Differentiation
-
 % deriv(E,X,DE) is true if DE is the derivative of E with respect to X
 deriv(X,X,1) :-
     format('[Step] Derivative d/d~w ~w = ~f~n', [X,X,1]). 
@@ -229,6 +226,31 @@ integ(A-B,X,IA-IB) :-
     integ(B,X,IB),
     format('[Step] Integral of sum is sum of integrals: Integral of ~w w.r.t. ~w = ~w~n', [A-B,X,IA-IB]).
 
+
+% Gradient descent with fixed step size, needs a small enough tolerance for it to be accurate.
+% VAR is the variable of the function i.e. x
+% ALPHA is step size
+% TOL is tolerance, For these examples we picked 10^-8
+% FPRIME is derivative of F w.r.t VAR
+% FPRIMEX is FPRIME evaluated at X
+% ITERS is number of iterations
+% MIN is the result we want: the minimum value the gradient descent function finds.
+gradDescent(F, VAR, ALPHA, TOL, X, ITERS, MIN) :- 
+    deriv(F,VAR,FPRIME),
+    eval(FPRIME,[val(VAR,X)],FPRIMEX),
+    eval(F,[val(VAR,X)],CMIN),
+    X1 is X - ALPHA * FPRIMEX,
+    format('[Gradient Descent ~d] At ~w = ~f | f(~w) = ~f | f\'(~w) = ~f~n', [ITERS,VAR,X,VAR,CMIN,VAR,FPRIMEX]),
+    ((abs(X1-X) < TOL) -> eval(F,[val(VAR,X1)],MIN) ;
+    NITERS is ITERS+1,
+    gradDescent(F,VAR,ALPHA,TOL,X1, NITERS, MIN)
+    ).
+
+% Gradient Descent demo queries:
+% gradDescent(x^2, x, 0.01, 0.00000001,10, 0, MIN).
+% gradDescent(sin(x), x, 0.01, 0.00000001,10, 0, MIN).
+% gradDescent(x^2 - 3*x + 4, 0.01, 0.00000001,10, 0, MIN).
+% Complex example: deriv(1/3*x^3, x, K), gradDescent(K, x, 0.01, 0.00000001, 10, 0, MIN).
 
 % DEMO
 % integ(8*x, x, I).
