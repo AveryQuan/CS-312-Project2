@@ -66,34 +66,6 @@ eval(exp(A),Env,V) :-
 
 %  Differentiation
 
-% dv(E,X,DE) is true if DE is the derivative of E with respect to X
-dv(X,X,1).
-dv(C,X,0) :- atomic(C), dif(C,X).
-dv(A+B,X,DA+DB) :- dv(A,X,DA), dv(B,X,DB).
-dv(A-B,X,DA-DB) :- dv(A,X,DA), dv(B,X,DB).
-dv(-A,X,-DA) :- dv(A,X,DA).
-dv(A*B,X,DA*B+DB*A) :- dv(A,X,DA), dv(B,X,DB).
-dv(exp(E),X,exp(E)*DE) :- dv(E,X,DE).
-dv(F/G, X, (DF*G+DG*F)/G^2) :- dv(F,X,DF), dv(G,X,DG).
-dv(sin(E),X,cos(E)*DE) :- dv(E,X,DE).
-
-% smp(E,S) is true if S is a simplified version of expression E
-smp(E,E) :- atomic(E).
-smp(A+B,E) :- smp(A,AS), smp(B,BS), smps(AS+BS,E).
-smp(A*B,E) :- smp(A,AS), smp(B,BS), smps(AS*BS,E).
-
-% smps(E,S) is true if E is an expression with subparts simplified, S is it simplifies
-smps(0+A,A).
-smps(A+0,A).
-smps(A+B,V) :- number(A), number(B), V is A+B.
-smps(A+B,A+B).
-smps(0*_,0).
-smps(_*0,0).
-smps(1*A,A).
-smps(A*1,A).
-smps(A*B,V) :- number(A), number(B), V is A*B.
-smps(A*B,A*B).
-
 % deriv(E,X,DE) is true if DE is the derivative of E with respect to X
 deriv(X,X,1) :-
     format('[Step] Derivative d/d~w ~w = ~f~n', [X,X,1]). 
