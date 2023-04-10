@@ -47,6 +47,18 @@ eval(sigmoid(A),Env,V) :-
     eval(A,Env,VA),
     V is 1/(1+exp(-VA)),
     format('[Step] We get the sigmoid of ~w = ~f to get ~f~n', [A,VA,V]).
+eval(sin(A),Env,V) :-
+    eval(A,Env,VA),
+    V is sin(VA),
+    format('[Step] We get the sine of ~w = sin(~f) = ~f~n', [A,VA,V]).
+eval(cos(A),Env,V) :-
+    eval(A,Env,VA),
+    V is cos(VA),
+    format('[Step] We get the cosine of ~w = cos(~f) = ~f~n', [A,VA,V]).
+eval(exp(A),Env,V) :-
+    eval(A,Env,VA),
+    V is exp(VA),
+    format('[Step] We get the exponent of ~w (e^~w)= exp(~f) = ~f~n', [A,VA,VA,V]).
 
 % try:
 % eval(aa*aa+b*11, [val(aa,3), val(b,7), val(dd,23)], V).
@@ -124,8 +136,6 @@ deriv(exp(E),X,exp(E)*DE) :-
 deriv(log(E),X,DE/E) :-
   deriv(E,X,DE),
   format('[Step] Derivative of log: d/d~w ~w = ~w~n', [X,log(E),DE/E]). 
-
-% sigmoid(X) = 1/(1+exp(-X))
 deriv(sigmoid(E),X,sigmoid(E)*(1-sigmoid(E))*DE) :-
     deriv(E,X,DE),
     format('[Step] Derivative of sigmoid: d/d~w ~w = ~w~n', [X,sigmoid(E),sigmoid(E)*(1-sigmoid(E))*DE]). 
