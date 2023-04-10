@@ -42,6 +42,7 @@ foo(A,C,V) :- format('[Step] We resolve the value').
 
 %eval(Exp, Env, V) is true if expression Exp evaluates to V given environment Env
 % An environment is a list of val(Var,Val) indicating that variable Var has value Val
+% eval supports addition, subtraction, division, multiplication operations of constant, polynomial, sine/cosine, natural logarithmic, and exponential functions.
 eval(X,Env,V) :-
     member(val(X,V),Env),
     format('[Step] We resolve the value of ~w = ~f~n', [X,V]). 
@@ -57,6 +58,11 @@ eval((A*B),Env,V) :-
     eval(B,Env,VB),
     V is VA*VB,
     format('[Step] We take the product of ~w = ~f and ~w = ~f to get ~f~n', [A,VA,B,VB,V]). 
+eval((A/B),Env,V) :-
+    eval(A,Env,VA),
+    eval(B,Env,VB),
+    V is VA/VB,
+    format('[Step] We divide ~w = ~f by ~w = ~f to get ~f~n', [A,VA,B,VB,V]). 
 eval((A-B),Env,V) :-
     eval(A,Env,VA),
     eval(B,Env,VB),
@@ -75,7 +81,7 @@ eval((A^B),Env,V) :-
 eval(log(A),Env,V) :-
     eval(A,Env,VA),
     V is log(VA),
-    format('[Step] We take the natural log of ~w = ~f to get ~f~n', [A,VA,V]).
+    format('[Step] We take the natural log of ~w = ~f in log(~w) to get ~f~n', [A,VA,A,V]).
 eval(exp(A),Env,V) :-
     eval(A,Env,VA),
     V is exp(VA),
@@ -83,7 +89,7 @@ eval(exp(A),Env,V) :-
 eval(sigmoid(A),Env,V) :-
     eval(A,Env,VA),
     V is 1/(1+exp(-VA)),
-    format('[Step] We get the sigmoid of ~w = ~f to get ~f~n', [A,VA,V]).
+    format('[Step] We get the sigmoid of ~w = ~f in exp(~w)/(1 + exp(~w)) to get ~f~n', [A,VA,A,A,V]).
 eval(sin(A),Env,V) :-
     eval(A,Env,VA),
     V is sin(VA),
@@ -97,9 +103,27 @@ eval(exp(A),Env,V) :-
     V is exp(VA),
     format('[Step] We get the exponent of ~w (e^~w)= exp(~f) = ~f~n', [A,VA,VA,V]).
 
-% try:
-% eval(aa*aa+b*11, [val(aa,3), val(b,7), val(dd,23)], V).
-% eval(x+3*x+6*x*y+ 11*x*x, [val(x,7),val(y,-3),val(z,11)]).
+% For demo:
+% Eval queries with steps:
+% Basic exmaple: eval(a^2 + b^2 ,[val(a,3),val(b,4)],V). 
+% Sine, cosine square sum identity: eval(sin(x)^2 + cos(x)^2,[val(x,12)],V).  
+% log - exp property: eval(log(exp(x)),[val(x,120)],V).
+% Sigmoid is e^x / (1+e^x), neat example: eval(sigmoid(x),[val(x,0)],V). 
+
+
+% Derivative demo queries:
+% sine derivate: deriv(sin(3.14*y),y,V),eval(V,[val(y,1)],X).
+% polynomial derivative: deriv(y^4 + y^2 + y + 21,y,V),eval(V,[val(y,17)],X).    
+% exponential derivative: deriv(exp(y),y,V),eval(V,[val(y,1)],X).  
+% Multivariable Polynomial derivative: deriv(y^4+x,y,V),eval(V,[val(y,17),val(x,1)],X). 
+
+% Integral demo queries:
+% Polynomial integral: integ(y^4,y,V),eval(V,[val(y,17)],X). 
+% Multivariable Polynomial integral: integ(y^4+x,y,V),eval(V,[val(y,17),val(x,1)],X).
+% Integral of exponent function: integ(exp(y),y,V),eval(V,[val(y,1)],X).  
+% Logarithmic integral: integ(log(y),y,V),eval(V,[val(y,17)],X).
+
+
 
 %  Differentiation
 
@@ -130,9 +154,10 @@ deriv(A/B,X,(B*DA-A*DB)/(B*B)) :-
 deriv(-A,X,-DA) :-
     deriv(A,X,DA),
     format('[Step] Derivative of d/d~w ~w = ~w~n', [X,-A,-DA]). 
-deriv(A^B,X,B*(A^(B-1))*DA) :-  % only works when B does not involve X
+deriv(A^B,X,B*(A^C)*DA) :-  % only works when B does not involve X
     deriv(A,X,DA),
-    format('[Step] Derivative Chain Rule: d/d~w ~w = ~w*(~w^(~w-1))*~w ~n', [X,A^B,B,A,B,DA]). 
+    simplify((B-1),C),
+    format('[Step] Derivative Chain Rule: d/d~w ~w = ~w ~n', [X,A^B,B*(A^C)*DA]). 
 deriv(sin(E),X,cos(E)*DE) :-
     deriv(E,X,DE),
     format('[Step] Derivative of sine is cosine: d/d~w ~w = ~w~n', [X,sin(E),cos(E)*DE]). 
