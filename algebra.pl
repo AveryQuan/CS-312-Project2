@@ -3,6 +3,43 @@
   
 % An expression can include algebaic variables, which are Prolog constants
 
+% use if cant run pce
+%
+%assertz(file_search_path(library,pce('prolog/lib'))).
+%assertz(file_search_path(pce,swi(xpce))).
+:- use_module(library(pce)).
+
+ask_name(Name) :-
+        new(D, dialog('Register')),
+        send(D, scrollbars, both),
+        send(D, append(new(N1, text_item(equation)))),
+        send(D, append(new(N2, text_item(answer)))),
+        send(D, append(new(N3, text_item(respect)))),
+        send(D, append(new(S, new(S, menu(function))))),
+        send(S, append, eval),
+        send(S, append, simplify),
+        send(S, append, deriv),
+        send(S, append, integ),
+        send(D, append(button(enter, and(message(@prolog, output,
+                                          N1?selection,N2?selection,N3?selection, S?selection))))),
+        send(D, append(button(cancel, message(D, return, @nil)))),
+
+        send(D, layout),
+        send(D, size, size(600,600)),
+
+        get(D, confirm, Rval),
+        Rval \== @nil, % canceled
+        Name = Rval,
+        free(D).
+
+output(E,A,R, integ) :- integ(E, R, A).
+output(E,A,R, eval) :- foo(E, R, A).
+
+integ(0,0,0) :- format('[Step] We resolve the value').
+%integ(A,C,V) :- format('[Step] We resolve the value').
+
+foo(A,C,V) :- format('[Step] We resolve the value').
+
 %eval(Exp, Env, V) is true if expression Exp evaluates to V given environment Env
 % An environment is a list of val(Var,Val) indicating that variable Var has value Val
 eval(X,Env,V) :-
