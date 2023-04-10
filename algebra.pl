@@ -218,12 +218,13 @@ integ(cos(X),X,sin(X)) :-
 % integ(x^4, x, I).     % I = (X^5)/5
 
 integ(C*A,X,C*IA) :-
-    atomic(C),
+    number(C),
     integ(A, X, IA),
     format('[Step] Integral of constant multiple: ~w w.r.t. ~w = ~w~n', [C*A,X,C*IA]).
 integ(A*C,X,IA) :-
-    atomic(C),
-    integ(C*A,X,IA).
+    number(C),
+    integ(C*A,X,IA),
+    format('[Step] Integral of constant multiple: ~w w.r.t. ~w = ~w~n', [A*C,X,C*IA]).
 integ(A+B,X,IA+IB) :-
     integ(A,X,IA),
     integ(B,X,IB),
