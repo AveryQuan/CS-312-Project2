@@ -207,16 +207,23 @@ integ(C^X, X, (C^X)/log(C)) :-
     format('[Step] Integral of constant to the power of a variable: ~w w.r.t. ~w = ~w~n', [C^X, X, (C^X)/log(C)]).
 integ(log(X), X, X*log(X)-X) :-
     format('[Step] Integral of log: ~w w.r.t. ~w = ~w~n', [log(X), X, X*log(X)-X]).
+integ(sin(X),X,-cos(X)) :-
+    format('[Step] Integral of sin(~w) w.r.t. ~w = -cos(~w)~n', [X,X,X]).
+integ(cos(X),X,sin(X)) :-
+    format('[Step] Integral of cos(~w) w.r.t. ~w = sin(~w)~n', [X,X,X]).
 
 % DEMO
-% integ(0, X, 0).
-% integ(5, X, 5*X).
-% integ(X^4, X, (X^5)/5).
+% integ(0, x, I).       % I = 0
+% integ(5, x, I).       % I = 5x
+% integ(x^4, x, I).     % I = (X^5)/5
 
 integ(C*A,X,C*IA) :-
     atomic(C),
     integ(A, X, IA),
     format('[Step] Integral of constant multiple: ~w w.r.t. ~w = ~w~n', [C*A,X,C*IA]).
+integ(A*C,X,IA) :-
+    atomic(C),
+    integ(C*A,X,IA).
 integ(A+B,X,IA+IB) :-
     integ(A,X,IA),
     integ(B,X,IB),
@@ -226,6 +233,10 @@ integ(A-B,X,IA-IB) :-
     integ(B,X,IB),
     format('[Step] Integral of sum is sum of integrals: Integral of ~w w.r.t. ~w = ~w~n', [A-B,X,IA-IB]).
 
+% DEMO
+% integ(8*x, x, I).     % I = 8*(x^2/2)
+% integ(2*x+x, x, I).   % I = 2*(x^2/2)+x^2/2.
+% integ(2*x-x, x, I).   % I = 2*(x^2/2)-x^2/2.
 
 % Gradient descent with fixed step size, needs a small enough tolerance for it to be accurate.
 % VAR is the variable of the function i.e. x
@@ -251,11 +262,6 @@ gradDescent(F, VAR, ALPHA, TOL, X, ITERS, MIN) :-
 % gradDescent(sin(x), x, 0.01, 0.00000001,10, 0, MIN).
 % gradDescent(x^2 - 3*x + 4, 0.01, 0.00000001,10, 0, MIN).
 % Complex example: deriv(1/3*x^3, x, K), gradDescent(K, x, 0.01, 0.00000001, 10, 0, MIN).
-
-% DEMO
-% integ(8*x, x, I).
-% integ(2*x+x, x, I).
-% integ(2*x-x, x, I).
 
 %simplify(Exp, Exp2) is true if expression Exp2 is a simplifed form of Exp
 simplify(X,X) :-
