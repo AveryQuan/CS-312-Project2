@@ -7,38 +7,58 @@
 %
 %assertz(file_search_path(library,pce('prolog/lib'))).
 %assertz(file_search_path(pce,swi(xpce))).
+
+% for Demo, run initialize(Calc) to display gui. gui only shows if statement is correct or not, steps are printed in cmd still
 :- use_module(library(pce)).
 
-ask_name(Name) :-
+initialize(Calc) :-
         new(D, dialog('Register')),
         send(D, scrollbars, both),
-        send(D, append(new(N1, text_item(equation)))),
-        send(D, append(new(N2, text_item(answer)))),
-        send(D, append(new(N3, text_item(respect)))),
-        send(D, append(new(S, new(S, menu(function))))),
-        send(S, append, eval),
-        send(S, append, simplify),
-        send(S, append, deriv),
-        send(S, append, integ),
-        send(D, append(button(enter, and(message(@prolog, output,
-                                          N1?selection,N2?selection,N3?selection, S?selection))))),
+        send(D, append(new(E, text_item(equation)))),
+        send(D, append(new(R, text_item(wrt)))),
+        send(D, append(new(A, text_item(answer)))),
+        send(D, append(new(S, text_item(correctness)))),
+
+        send(D, append(button(derivative, and(message(@prolog, derivative,
+                                          E,A,R,S))))),
+        send(D, append(button(integrate, and(message(@prolog, integrate,
+                                        E,A,R,S))))),
         send(D, append(button(cancel, message(D, return, @nil)))),
 
         send(D, layout),
         send(D, size, size(600,600)),
 
         get(D, confirm, Rval),
+        free(D),
         Rval \== @nil, % canceled
-        Name = Rval,
-        free(D).
+        Calc = Rval.
 
-output(E,A,R, integ) :- integ(E, R, A).
-output(E,A,R, eval) :- foo(E, R, A).
 
-integ(0,0,0) :- format('[Step] We resolve the value').
-%integ(A,C,V) :- format('[Step] We resolve the value').
+integrate(E,A,R,S) :-
+                    get(E, selection, ET),
+                    term_string(D, ET),
+                    get(A, selection, AT),
+                    term_string(H, AT),
+                    get(R, selection, RT),
+                    term_string(J, RT),
+                    format('~n[Evaluating] \u222B ~w d~w = ~w ~n', [D,H,J]),
+                    (   integ(D, J, H)
+                    ->   send(S, selection, 'Your answer is correct')
+                    ;   send(S, selection, 'Your answer is incorrect')).
 
-foo(A,C,V) :- format('[Step] We resolve the value').
+
+derivative(E,A,R,S) :-
+                    get(E, selection, ET),
+                    term_string(D, ET),
+                    get(A, selection, AT),
+                    term_string(H, AT),
+                    get(R, selection, RT),
+                    term_string(J, RT),
+                    format('~n[Evaluating] d/d~w ~w = ~w ~n', [J,D,H]),
+                    (   deriv(D, J, H)
+                    ->   send(S, selection, 'Your answer is correct')
+                    ;   send(S, selection, 'Your answer is incorrect')).
+
 
 %eval(Exp, Env, V) is true if expression Exp evaluates to V given environment Env
 % An environment is a list of val(Var,Val) indicating that variable Var has value Val
