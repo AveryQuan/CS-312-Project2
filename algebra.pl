@@ -143,10 +143,7 @@ eval(exp(A),Env,V) :-
 % Integral of exponent function: integ(exp(y),y,V),eval(V,[val(y,1)],X).  
 % Logarithmic integral: integ(log(y),y,V),eval(V,[val(y,17)],X).
 
-
-
 %  Differentiation
-
 % deriv(E,X,DE) is true if DE is the derivative of E with respect to X
 deriv(X,X,1) :-
     format('[Step] Derivative d/d~w ~w = ~f~n', [X,X,1]). 
@@ -230,16 +227,24 @@ integ(C^X, X, (C^X)/log(C)) :-
     format('[Step] Integral of constant to the power of a variable: ~w w.r.t. ~w = ~w~n', [C^X, X, (C^X)/log(C)]).
 integ(log(X), X, X*log(X)-X) :-
     format('[Step] Integral of log: ~w w.r.t. ~w = ~w~n', [log(X), X, X*log(X)-X]).
+integ(sin(X),X,-cos(X)) :-
+    format('[Step] Integral of sin(~w) w.r.t. ~w = -cos(~w)~n', [X,X,X]).
+integ(cos(X),X,sin(X)) :-
+    format('[Step] Integral of cos(~w) w.r.t. ~w = sin(~w)~n', [X,X,X]).
 
 % DEMO
-% integ(0, X, 0).
-% integ(5, X, 5*X).
-% integ(X^4, X, (X^5)/5).
+% integ(0, x, I).       % I = 0
+% integ(5, x, I).       % I = 5x
+% integ(x^4, x, I).     % I = (X^5)/5
 
 integ(C*A,X,C*IA) :-
-    atomic(C),
+    number(C),
     integ(A, X, IA),
     format('[Step] Integral of constant multiple: ~w w.r.t. ~w = ~w~n', [C*A,X,C*IA]).
+integ(A*C,X,IA) :-
+    number(C),
+    integ(C*A,X,IA),
+    format('[Step] Integral of constant multiple: ~w w.r.t. ~w = ~w~n', [A*C,X,C*IA]).
 integ(A+B,X,IA+IB) :-
     integ(A,X,IA),
     integ(B,X,IB),
@@ -249,11 +254,35 @@ integ(A-B,X,IA-IB) :-
     integ(B,X,IB),
     format('[Step] Integral of sum is sum of integrals: Integral of ~w w.r.t. ~w = ~w~n', [A-B,X,IA-IB]).
 
-
 % DEMO
-% integ(8*x, x, I).
-% integ(2*x+x, x, I).
-% integ(2*x-x, x, I).
+% integ(8*x, x, I).     % I = 8*(x^2/2)
+% integ(2*x+x, x, I).   % I = 2*(x^2/2)+x^2/2.
+% integ(2*x-x, x, I).   % I = 2*(x^2/2)-x^2/2.
+
+% Gradient descent with fixed step size, needs a small enough tolerance for it to be accurate.
+% VAR is the variable of the function i.e. x
+% ALPHA is step size
+% TOL is tolerance, For these examples we picked 10^-8
+% FPRIME is derivative of F w.r.t VAR
+% FPRIMEX is FPRIME evaluated at X
+% ITERS is number of iterations
+% MIN is the result we want: the minimum value the gradient descent function finds.
+gradDescent(F, VAR, ALPHA, TOL, X, ITERS, MIN) :- 
+    deriv(F,VAR,FPRIME),
+    eval(FPRIME,[val(VAR,X)],FPRIMEX),
+    eval(F,[val(VAR,X)],CMIN),
+    X1 is X - ALPHA * FPRIMEX,
+    format('[Gradient Descent ~d] At ~w = ~f | f(~w) = ~f | f\'(~w) = ~f~n', [ITERS,VAR,X,VAR,CMIN,VAR,FPRIMEX]),
+    ((abs(X1-X) < TOL) -> eval(F,[val(VAR,X1)],MIN) ;
+    NITERS is ITERS+1,
+    gradDescent(F,VAR,ALPHA,TOL,X1, NITERS, MIN)
+    ).
+
+% Gradient Descent demo queries:
+% gradDescent(x^2, x, 0.01, 0.00000001,10, 0, MIN).
+% gradDescent(sin(x), x, 0.01, 0.00000001,10, 0, MIN).
+% gradDescent(x^2 - 3*x + 4, 0.01, 0.00000001,10, 0, MIN).
+% Complex example: deriv(1/3*x^3, x, K), gradDescent(K, x, 0.01, 0.00000001, 10, 0, MIN).
 
 %simplify(Exp, Exp2) is true if expression Exp2 is a simplifed form of Exp
 simplify(X,X) :-
