@@ -1,4 +1,5 @@
 # CS-312-Project2
+Calculate Algebraic Equations and Show Steps
 
 1. Add Extra derivatives (trig)
 
